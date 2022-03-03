@@ -1,8 +1,8 @@
-#SpringBoot Application
+# SpringBoot Application
 
 Sample SpringBoot Application Used to Manage Contacts
 
-#Requirements
+# Requirements
 
 For building and running the application you need:
 
