@@ -1,0 +1,28 @@
+version: 0.2
+
+env:
+  parameter-store:
+    DOCKER_HUB_USERNAME: docker_hub_username
+    DOCKER_HUB_PASSWORD: docker_hub_password
+
+phases:
+  install:
+    runtime-versions:
+      java: corretto8
+
+  pre_build:
+    commands:
+      - echo Logging in to Docker Hub
+      - echo "$DOCKER_HUB_PASSWORD" | docker login --username "$DOCKER_HUB_USERNAME" --password-stdin
+      - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+
+  build:
+    commands:
+      - mvn clean package -DskipTests
+      - docker build -t $DOCKER_HUB_USERNAME/springboot-app:$IMAGE_TAG .
+      - docker tag $DOCKER_HUB_USERNAME/springboot-app:$IMAGE_TAG $DOCKER_HUB_USERNAME/springboot-app:latest
+
+  post_build:
+    commands:
+      - docker push $DOCKER_HUB_USERNAME/springboot-app:$IMAGE_TAG
+      - docker push $DOCKER_HUB_USERNAME/springboot-app:latest
